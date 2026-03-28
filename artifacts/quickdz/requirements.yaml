@@ -1,0 +1,24 @@
+packages:
+  "framer-motion": "For smooth page transitions, stagger animations, and polished interactions"
+  "zustand": "For lightweight cart and session state management"
+  "i18next": "For core translation and RTL support"
+  "react-i18next": "React bindings for multilingual support"
+  "react-hook-form": "For robust checkout and instant order forms"
+  "@hookform/resolvers": "For validating forms with Zod"
+  "uuid": "To generate persistent anonymous session IDs for favorites and cart"
+
+images:
+  - path: "artifacts/quickdz/public/images/hero-bg.png"
+    description: "Modern, abstract 3D mesh background in rich Algerian green (emerald) and warm gold, with soft lighting and premium ecommerce aesthetics, depth of field"
+    aspect_ratio: "16:9"
+  - path: "artifacts/quickdz/public/images/logo.png"
+    description: "Minimalist modern ecommerce logo mark for 'QuickDz', featuring a subtle shopping bag merged with a lightning bolt, deep emerald green on transparent background"
+    aspect_ratio: "1:1"
+  - path: "artifacts/quickdz/public/images/promo-banner.png"
+    description: "Vibrant abstract marketing banner background with soft glowing shapes in crimson red, emerald green, and white, premium promotional feel"
+    aspect_ratio: "21:9"
+
+notes:
+  - Expecting @workspace/api-client-react to export hooks and schemas from generated OpenAPI.
+  - Setting up RTL layout manually based on i18next language state.
+  - Using uuid to maintain anonymous sessionId in localStorage for favorites mapping.

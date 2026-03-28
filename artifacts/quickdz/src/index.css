@@ -1,0 +1,177 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Kufi+Arabic:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-card-border: hsl(var(--card-border));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-popover-border: hsl(var(--popover-border));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-primary-border: var(--primary-border);
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-secondary-border: var(--secondary-border);
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-muted-border: var(--muted-border);
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-accent-border: var(--accent-border);
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-destructive-border: var(--destructive-border);
+
+  --font-sans: 'Outfit', 'Noto Kufi Arabic', sans-serif;
+  --font-arabic: 'Noto Kufi Arabic', sans-serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+}
+
+:root {
+  /* Vibrant, premium Algerian-inspired Light Mode */
+  --background: 120 20% 98%;
+  --foreground: 152 20% 10%;
+  
+  --border: 152 15% 90%;
+  --input: 152 15% 90%;
+  --ring: 152 80% 25%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 152 20% 10%;
+  --card-border: 152 15% 90%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 152 20% 10%;
+  --popover-border: 152 15% 90%;
+
+  /* Emerald Green / QuickDz Green */
+  --primary: 152 80% 25%;
+  --primary-foreground: 0 0% 100%;
+  
+  --secondary: 152 30% 94%;
+  --secondary-foreground: 152 80% 20%;
+
+  --muted: 152 15% 94%;
+  --muted-foreground: 152 10% 45%;
+
+  /* Algerian Red / Warm Amber accent */
+  --accent: 349 80% 45%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 349 80% 45%;
+  --destructive-foreground: 0 0% 100%;
+
+  --radius: 0.75rem;
+
+  --shadow-2xs: 0px 2px 0px 0px hsl(152 80% 25% / 0.02);
+  --shadow-xs: 0px 2px 4px 0px hsl(152 80% 25% / 0.04);
+  --shadow-sm: 0px 4px 8px -1px hsl(152 80% 25% / 0.06);
+  --shadow: 0px 8px 16px -2px hsl(152 80% 25% / 0.08);
+  --shadow-md: 0px 12px 24px -4px hsl(152 80% 25% / 0.1);
+  --shadow-lg: 0px 20px 40px -8px hsl(152 80% 25% / 0.12);
+  --shadow-xl: 0px 32px 64px -12px hsl(152 80% 25% / 0.14);
+}
+
+.dark {
+  /* Rich, sophisticated Dark Mode */
+  --background: 152 20% 4%;
+  --foreground: 0 0% 98%;
+
+  --border: 152 15% 15%;
+  --input: 152 15% 15%;
+  --ring: 152 70% 35%;
+
+  --card: 152 20% 6%;
+  --card-foreground: 0 0% 98%;
+  --card-border: 152 15% 15%;
+
+  --popover: 152 20% 6%;
+  --popover-foreground: 0 0% 98%;
+  --popover-border: 152 15% 15%;
+
+  --primary: 152 70% 35%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 152 20% 15%;
+  --secondary-foreground: 0 0% 98%;
+
+  --muted: 152 15% 12%;
+  --muted-foreground: 152 10% 65%;
+
+  --accent: 349 70% 50%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 349 70% 50%;
+  --destructive-foreground: 0 0% 100%;
+
+  --shadow-2xs: 0px 2px 0px 0px hsl(0 0% 0% / 0.4);
+  --shadow-xs: 0px 2px 4px 0px hsl(0 0% 0% / 0.4);
+  --shadow-sm: 0px 4px 8px -1px hsl(0 0% 0% / 0.5);
+  --shadow: 0px 8px 16px -2px hsl(0 0% 0% / 0.6);
+  --shadow-md: 0px 12px 24px -4px hsl(0 0% 0% / 0.7);
+  --shadow-lg: 0px 20px 40px -8px hsl(0 0% 0% / 0.8);
+  --shadow-xl: 0px 32px 64px -12px hsl(0 0% 0% / 0.9);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased selection:bg-primary/20 selection:text-primary transition-colors duration-300;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight text-foreground;
+  }
+  /* RTL Scrollbar fixing */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full border-2 border-background;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+}
+
+.glass-panel {
+  @apply bg-background/70 backdrop-blur-xl border border-white/10 dark:border-white/5 shadow-lg;
+}
+
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary to-accent;
+}
+
+/* Ensure RTL layout supports proper mirroring in standard tailwind classes */
+html[dir="rtl"] {
+  text-align: right;
+}
+html[dir="ltr"] {
+  text-align: left;
+}
