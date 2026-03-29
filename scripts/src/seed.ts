@@ -3,13 +3,16 @@ import { categoriesTable, productsTable, regionsTable, citiesTable } from "@work
 import { sql } from "drizzle-orm";
 
 async function seed() {
-  console.log("🌱 Seeding database...");
+  const seedMode = process.env.SEED_MODE === "bootstrap" ? "bootstrap" : "reset";
+  console.log(`🌱 Seeding database in ${seedMode} mode...`);
 
-  // Clear existing data
-  await db.execute(sql`TRUNCATE TABLE categories, products, regions, cities, orders, favorites RESTART IDENTITY CASCADE`);
+  if (seedMode === "reset") {
+    await db.execute(sql`TRUNCATE TABLE categories, products, regions, cities, orders, favorites RESTART IDENTITY CASCADE`);
+    console.log("🧹 Cleared existing catalog and checkout data");
+  }
 
   // ─── Categories ───────────────────────────────────────────────────
-  const categories = await db.insert(categoriesTable).values([
+  const categorySeeds = [
     {
       name: "Electronics",
       nameAr: "الإلكترونيات",
@@ -120,12 +123,29 @@ async function seed() {
       imageUrl: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80",
       icon: "🛒",
     },
-  ]).returning();
+  ];
 
-  console.log(`✅ Inserted ${categories.length} categories`);
+  const existingCategories = seedMode === "bootstrap" ? await db.select().from(categoriesTable) : [];
+  const existingCategorySlugs = new Set(existingCategories.map((category) => category.slug));
+  const missingCategories = categorySeeds.filter((category) => !existingCategorySlugs.has(category.slug));
+
+  if (missingCategories.length > 0) {
+    await db.insert(categoriesTable).values(missingCategories);
+  }
+
+  const availableCategories = await db.select().from(categoriesTable);
+  if (seedMode === "reset") {
+    console.log(`✅ Inserted ${availableCategories.length} categories`);
+  } else if (missingCategories.length > 0) {
+    console.log(`✅ Inserted ${missingCategories.length} missing categories`);
+  } else {
+    console.log(`⏭️ Skipped categories; ${availableCategories.length} already present`);
+  }
 
   const catMap: Record<string, number> = {};
-  categories.forEach(c => { catMap[c.slug] = c.id; });
+  availableCategories.forEach((category) => {
+    catMap[category.slug] = category.id;
+  });
 
   // ─── Products ─────────────────────────────────────────────────────
   const products = [
@@ -612,11 +632,25 @@ async function seed() {
     },
   ];
 
-  const insertedProducts = await db.insert(productsTable).values(products as any).returning();
-  console.log(`✅ Inserted ${insertedProducts.length} products`);
+  const existingProducts = seedMode === "bootstrap" ? await db.select().from(productsTable) : [];
+  const existingProductSlugs = new Set(existingProducts.map((product) => product.slug));
+  const missingProducts = products.filter((product) => !existingProductSlugs.has(product.slug));
+
+  if (missingProducts.length > 0) {
+    await db.insert(productsTable).values(missingProducts as any);
+  }
+
+  const availableProducts = await db.select().from(productsTable);
+  if (seedMode === "reset") {
+    console.log(`✅ Inserted ${availableProducts.length} products`);
+  } else if (missingProducts.length > 0) {
+    console.log(`✅ Inserted ${missingProducts.length} missing products`);
+  } else {
+    console.log(`⏭️ Skipped products; ${availableProducts.length} already present`);
+  }
 
   // ─── Regions (Algerian Wilayas) ───────────────────────────────────
-  const regions = await db.insert(regionsTable).values([
+  const regionSeeds = [
     { code: "01", name: "Adrar", nameAr: "أدرار", nameFr: "Adrar", deliveryDays: 5, deliveryFee: "800" },
     { code: "02", name: "Chlef", nameAr: "الشلف", nameFr: "Chlef", deliveryDays: 3, deliveryFee: "450" },
     { code: "03", name: "Laghouat", nameAr: "الأغواط", nameFr: "Laghouat", deliveryDays: 4, deliveryFee: "600" },
@@ -675,37 +709,67 @@ async function seed() {
     { code: "56", name: "Djanet", nameAr: "جانت", nameFr: "Djanet", deliveryDays: 7, deliveryFee: "1200" },
     { code: "57", name: "El M'Ghair", nameAr: "المغير", nameFr: "El M'Ghair", deliveryDays: 4, deliveryFee: "600" },
     { code: "58", name: "El Meniaa", nameAr: "المنيعة", nameFr: "El Meniaa", deliveryDays: 6, deliveryFee: "1000" },
-  ]).returning();
+  ];
 
-  console.log(`✅ Inserted ${regions.length} regions`);
+  const existingRegions = seedMode === "bootstrap" ? await db.select().from(regionsTable) : [];
+  const existingRegionCodes = new Set(existingRegions.map((region) => region.code));
+  const missingRegions = regionSeeds.filter((region) => !existingRegionCodes.has(region.code));
+
+  if (missingRegions.length > 0) {
+    await db.insert(regionsTable).values(missingRegions);
+  }
+
+  const availableRegions = await db.select().from(regionsTable);
+  if (seedMode === "reset") {
+    console.log(`✅ Inserted ${availableRegions.length} regions`);
+  } else if (missingRegions.length > 0) {
+    console.log(`✅ Inserted ${missingRegions.length} missing regions`);
+  } else {
+    console.log(`⏭️ Skipped regions; ${availableRegions.length} already present`);
+  }
 
   // Cities for major wilayas
   const algiersCities = [
-    { name: "Algiers Center", nameAr: "وسط الجزائر العاصمة", regionId: regions.find(r => r.code === "16")!.id },
-    { name: "Bab El Oued", nameAr: "باب الوادي", regionId: regions.find(r => r.code === "16")!.id },
-    { name: "Kouba", nameAr: "القبة", regionId: regions.find(r => r.code === "16")!.id },
-    { name: "Birkhadem", nameAr: "بئر خادم", regionId: regions.find(r => r.code === "16")!.id },
-    { name: "Hussein Dey", nameAr: "حسين داي", regionId: regions.find(r => r.code === "16")!.id },
-    { name: "El Harrach", nameAr: "الحراش", regionId: regions.find(r => r.code === "16")!.id },
-    { name: "Bachdjerrah", nameAr: "باش جراح", regionId: regions.find(r => r.code === "16")!.id },
-    { name: "Sidi M'Hamed", nameAr: "سيدي محمد", regionId: regions.find(r => r.code === "16")!.id },
+    { name: "Algiers Center", nameAr: "وسط الجزائر العاصمة", regionId: availableRegions.find(r => r.code === "16")!.id },
+    { name: "Bab El Oued", nameAr: "باب الوادي", regionId: availableRegions.find(r => r.code === "16")!.id },
+    { name: "Kouba", nameAr: "القبة", regionId: availableRegions.find(r => r.code === "16")!.id },
+    { name: "Birkhadem", nameAr: "بئر خادم", regionId: availableRegions.find(r => r.code === "16")!.id },
+    { name: "Hussein Dey", nameAr: "حسين داي", regionId: availableRegions.find(r => r.code === "16")!.id },
+    { name: "El Harrach", nameAr: "الحراش", regionId: availableRegions.find(r => r.code === "16")!.id },
+    { name: "Bachdjerrah", nameAr: "باش جراح", regionId: availableRegions.find(r => r.code === "16")!.id },
+    { name: "Sidi M'Hamed", nameAr: "سيدي محمد", regionId: availableRegions.find(r => r.code === "16")!.id },
   ];
 
   const oranCities = [
-    { name: "Oran", nameAr: "وهران", regionId: regions.find(r => r.code === "31")!.id },
-    { name: "Es Sénia", nameAr: "السانية", regionId: regions.find(r => r.code === "31")!.id },
-    { name: "Bir El Djir", nameAr: "بئر الجير", regionId: regions.find(r => r.code === "31")!.id },
-    { name: "Arzew", nameAr: "أرزيو", regionId: regions.find(r => r.code === "31")!.id },
+    { name: "Oran", nameAr: "وهران", regionId: availableRegions.find(r => r.code === "31")!.id },
+    { name: "Es Sénia", nameAr: "السانية", regionId: availableRegions.find(r => r.code === "31")!.id },
+    { name: "Bir El Djir", nameAr: "بئر الجير", regionId: availableRegions.find(r => r.code === "31")!.id },
+    { name: "Arzew", nameAr: "أرزيو", regionId: availableRegions.find(r => r.code === "31")!.id },
   ];
 
   const constCities = [
-    { name: "Constantine", nameAr: "قسنطينة", regionId: regions.find(r => r.code === "25")!.id },
-    { name: "El Khroub", nameAr: "الخروب", regionId: regions.find(r => r.code === "25")!.id },
-    { name: "Hamma Bouziane", nameAr: "حامة بوزيان", regionId: regions.find(r => r.code === "25")!.id },
+    { name: "Constantine", nameAr: "قسنطينة", regionId: availableRegions.find(r => r.code === "25")!.id },
+    { name: "El Khroub", nameAr: "الخروب", regionId: availableRegions.find(r => r.code === "25")!.id },
+    { name: "Hamma Bouziane", nameAr: "حامة بوزيان", regionId: availableRegions.find(r => r.code === "25")!.id },
   ];
 
-  await db.insert(citiesTable).values([...algiersCities, ...oranCities, ...constCities]);
-  console.log("✅ Inserted cities");
+  const citySeeds = [...algiersCities, ...oranCities, ...constCities];
+  const existingCities = seedMode === "bootstrap" ? await db.select().from(citiesTable) : [];
+  const existingCityKeys = new Set(existingCities.map((city) => `${city.regionId}:${city.name}`));
+  const missingCities = citySeeds.filter((city) => !existingCityKeys.has(`${city.regionId}:${city.name}`));
+
+  if (missingCities.length > 0) {
+    await db.insert(citiesTable).values(missingCities);
+  }
+
+  const availableCities = await db.select().from(citiesTable);
+  if (seedMode === "reset") {
+    console.log(`✅ Inserted ${availableCities.length} cities`);
+  } else if (missingCities.length > 0) {
+    console.log(`✅ Inserted ${missingCities.length} missing cities`);
+  } else {
+    console.log(`⏭️ Skipped cities; ${availableCities.length} already present`);
+  }
 
   console.log("🎉 Seeding complete!");
 }
